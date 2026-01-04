@@ -233,12 +233,18 @@ void stat(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
         if (option == 0) {
             menu(head_A, head_B, head_C);
         } else if (option == 1) {
-            stat_paking_car(head);
+            stat_paking_car(head_A);
+            stat_paking_car(head_B);
+            stat_paking_car(head_C);
         } else if (option == 2) {
-            stat_old_car(head);
+            stat_old_car(head_A);
+            stat_old_car(head_B);
+            stat_old_car(head_C);
 
         } else if (option == 3) {
-            stat_moon_fee(head);
+            stat_moon_fee(head_A);
+            stat_moon_fee(head_B);
+            stat_moon_fee(head_C);
         } else {
             printf("只有三个功能哦");
         }
