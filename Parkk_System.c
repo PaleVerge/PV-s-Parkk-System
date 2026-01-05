@@ -30,12 +30,14 @@ void menu(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void park(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void engage(PARKER * head);
 
-double leave_fee(PARKER * head,double * tot);
+
 void fee(PARKER * head_A, PARKER * head_B, PARKER * head_C);
+double leave_fee(PARKER * head,double * tot);
+void caculate_day_fee(PARKER * head,int year,int month,int day,double * tot);
 
 void search(PARKER * head_A, PARKER * head_B, PARKER * head_C);
-void find_vacant(PARKER *head);
-int  find_posid(PARKER *head);
+void find_space(PARKER *head);
+int  find_space_id(PARKER *head);
 void park_info(PARKER * head);
 
 void stat(PARKER * head_A, PARKER * head_B, PARKER * head_C);
@@ -43,37 +45,23 @@ void stat_paking_car(PARKER * head) ;
 void stat_old_car(PARKER * head);
 double stat_moon_fee(FILE *fp, int tag_year, int tag_moon) ;
 
-void  load_file(FILE * fp, PARKER * head);
-void save_file(FILE * fp, PARKER * head);
+void  load_file(char filename[], PARKER * head);
+void save_file(char filename[], PARKER * head);
 
 int main(void) {
-    FILE * fp_A,* fp_B,* fp_C;
-
     PARKER * head_A = create_node('A');
     PARKER * head_B = create_node('B');
     PARKER * head_C = create_node('C');
 
-    fp_A=fopen("aera_A.dat","rb");
-    fp_B=fopen("aera_B.dat","rb");
-    fp_C=fopen("aera_C.dat","rb");
-
-    load_file(fp_A,head_A);
-    load_file(fp_B,head_B);
-    load_file(fp_C,head_C);
-
-    fclose(fp_A);
-    fclose(fp_B);
-    fclose(fp_C);
+    load_file("aera_A.dat",head_A);
+    load_file("aera_B.dat",head_B);
+    load_file("aera_C.dat",head_C);
 
     menu(head_A, head_B, head_C);
 
-    fp_A=fopen("aera_A.dat","wb");
-    fp_B=fopen("aera_B.dat","wb");
-    fp_C=fopen("aera_C.dat","wb");
-
-    save_file(fp_A,head_A);
-    save_file(fp_B,head_B);
-    save_file(fp_C,head_C);
+    save_file("aera_A.dat",head_A);
+    save_file("aera_B.dat",head_B);
+    save_file("aera_C.dat",head_C);
 
     return 0;
 }
@@ -133,9 +121,8 @@ void engage(PARKER *head) {
         PARKER *newcar = (PARKER *) malloc(LEN);
         newcar->next=NULL;
         p->next = newcar;
-        printf("请输入当前时间:\n");
-        printf("格式-时:分：\n");
-        if (scanf("%d时%d分", &newcar->park.hour, &newcar->park.minute)) {
+        printf("请输入当前时间:\n格式为yyyy.m.d h:m\n");;
+        if (scanf("%d.%d.%d %d:%d",&p->park.year,&p->park.month,&p->park.day,&p->park.hour, &p->park.minute)==5) {
             printf("请输入车牌号:\n");
             scanf("%s", newcar->car_id);
             newcar->pos_id = head->pos_id;
@@ -143,13 +130,11 @@ void engage(PARKER *head) {
             printf("停车成功,你的车位号为%c%d\n",p->aera,p->pos_id);
             printf("按q退出\n");
         } else {
-            printf("输入不合法,即将返回上级\n");
+            printf("日期输入不合法,即将返回上级\n");
             return ;
         }
     }
-
 }
-
 void fee(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
     double tot=0;
@@ -161,31 +146,37 @@ void fee(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
         } else if (option == 2) {
             printf("您本次停车费用为%f,祝您一路顺风", leave_fee(head_B,&tot));
         } else if (option == 3) {
-            printf("您本次停车费用%f,为祝您一路顺风", leave_fee(head_C,&tot));
+            printf("您本次停车费用为%f,祝您一路顺风", leave_fee(head_C,&tot));
         } else {
             printf("没有既不大又不小还不中的车！");
             return ;
         }
-        FILE * fp;
-        fp=fopen("day_total_fee.txt","a");
+        FILE * fp=fopen("day_total_fee.txt","a");
         fprintf(fp,"%d年%d月%d日,%.1f元",tot);
         fclose(fp);
     }
 }
+void caculate_day_fee(PARKER * head,int yead,int month,int day,double * tot) {
+    FILE * fp=fopen("day_total_fee.txt","r+");
+
+
+}
 double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
-    double fee;
     PARKER * pre_p=head,*p=head->next;
     char cur_car_id[10];
     printf("请输入车牌号:\n");
     scanf("%d",&cur_car_id);
     while (p!=NULL) {
         if (!strcmp(p->car_id,cur_car_id)){
-            printf("请输入当前时间:\n格式-时:分：\n");
-            scanf("%d时%d分", &p->leave.hour, &p->leave.minute);
+            printf("请输入当前时间:\n格式为yyyy.m.d h:m\n");
+            scanf("%d.%d.%d %d:%d",&p->leave.year,&p->leave.month,&p->leave.day,&p->leave.hour, &p->leave.minute);
 
             int start = p->park.hour * 60 + p->park.minute;
             int end = p->leave.hour * 60 + p->leave.minute;
             int during =end-start;
+            if (during<0) {//跨天为负加一天
+                during=during+1440;
+            }
             int hour = during/60;
             int minute=during % 60;
             double fee_time;
@@ -198,15 +189,13 @@ double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
                   fee_time=hour+1;
                }
             }
-
-            if (head->pos_id > p->pos_id) {
+            if (head->pos_id > p->pos_id) { //保持头节点为最小车位号
                 head->pos_id = p->pos_id;
             }
             pre_p->next=p->next;
-            fee=head->price*fee_time;
-
+            double fee=head->price*fee_time;
+            caculate_day_fee(head,p->leave.year,p->leave.month,p->leave.day,tot);
             free(p);
-            *tot+=fee;
             return fee;
         }
         pre_p=p;
@@ -216,11 +205,11 @@ double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
 void park_info(PARKER * head) {
     PARKER * p = head->next;//跳过头节点
     while (p != NULL) {
-        printf("%c区 车位号:%d 车牌号:%s 停放时间:%d时%02d分\n",p->aera,p->pos_id,p->car_id,p->park.hour,p->park.minute);
+        printf("%c区 车位号:%d 车牌号:%s 停放时间:%4d年%02d月%2%2d日%02d时%02d分\n",p->aera,p->pos_id,p->car_id,p->park.year,p->park.month,p->park.day,p->park.hour,p->park.minute);
         p=p->next;
     }
 }
-void find_vacant(PARKER *head) {
+void find_space(PARKER *head) {
     PARKER * p=head;
     int flag[21]={0};
     if (p->pos_id==0) {
@@ -239,7 +228,7 @@ void find_vacant(PARKER *head) {
         }
     }
 }
-int  find_posid(PARKER *head) {
+int  find_space_id(PARKER *head) {
     PARKER * p=head;
     char cur_car_id[10];
     int find=0;
@@ -248,7 +237,8 @@ int  find_posid(PARKER *head) {
     while (p->next != NULL) {
         if (!strcmp(p->car_id,cur_car_id)) {
             find=1;
-            printf("该车停在%c区%02d\n",p->aera,p->pos_id);
+            printf("该车停在%c区%02d\n",head->aera,p->pos_id);
+            break;
         }
         p=p->next;
     }
@@ -266,13 +256,13 @@ void search(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
             park_info(head_B);
             park_info(head_C);
         } else if (option == 2) {
-            find_vacant(head_A);
-            find_vacant(head_B);
-            find_vacant(head_C);
+            find_space(head_A);
+            find_space(head_B);
+            find_space(head_C);
         } else if (option == 3) {
-            if (!find_posid(head_A)) {
-                if (!find_posid(head_B)) {
-                    if (!find_posid(head_C)) {
+            if (!find_space_id(head_A)) {
+                if (!find_space_id(head_B)) {
+                    if (!find_space_id(head_C)) {
                         printf("全场都没找到你的车\n");
                     }
                 }
@@ -300,8 +290,7 @@ void stat(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
             stat_old_car(head_C);
 
         } else if (option == 3) {
-            FILE *fp;
-            fp=fopen("day_total_fee.txt","r");
+            FILE * fp=fopen("day_total_fee.txt","r");
 
             int tag_year,tag_moon;
             printf("请输入待查询月份(格式-年:月):\n");
@@ -337,20 +326,18 @@ void stat_old_car(PARKER * head) {
 
         if (during>300) {
             count_old++;
-            printf("%c区 车位号%d 车牌号%s 停放时间%d时%02d分",p->aera,p->pos_id,p->car_id,p->park.hour,p->park.minute);
+            printf("%c区 车位号%d 车牌号%s 于%d时%02d分停车,已经%.1f小时.",p->aera,p->pos_id,p->car_id,p->park.hour,p->park.minute,(double)during/60);
         }
-        printf("停车炒股票5小时的车辆共有%d辆",count_old);
-
         p=p->next;
     }
+    printf("停车超过5小时的车辆共有%d辆.\n",count_old);
 }
 double stat_moon_fee(FILE *fp, int tag_year, int tag_moon) {
 
     int ori_year,ori_moon;
-    int moon_fee=0;
-    double day_money;
+    double day_money,moon_fee=0;
     rewind(fp);
-    while (fscanf(fp,"%d年%d月%*d日,%.2f元\n", &ori_year, &ori_moon,&day_money)!=EOF) {
+    while (fscanf(fp,"%d年%d月%*d日,%lf元\n", &ori_year, &ori_moon,&day_money)!=EOF) {
         if (ori_year==tag_year && ori_moon==tag_moon) {
             moon_fee+=day_money;
         }
@@ -381,8 +368,8 @@ PARKER *create_node(char aera) {
     }
     return cur_p;
 }
-
-void  load_file(FILE * fp, PARKER * head) {
+void  load_file(char filename[], PARKER * head) {
+    FILE * fp=fopen(filename,"rb");
     if (fp==NULL) {
         return;
     }
@@ -398,9 +385,10 @@ void  load_file(FILE * fp, PARKER * head) {
         p->next=new_car;
         p=new_car;
     }
+    fclose(fp);
 }
-
-void save_file(FILE * fp, PARKER * head) {
+void save_file(char filename[], PARKER * head) {
+    FILE * fp=fopen(filename,"wb");
     if (fp==NULL) {
         return;
     }
@@ -409,4 +397,5 @@ void save_file(FILE * fp, PARKER * head) {
         fwrite(p,LEN,1,fp);
         p=p->next;
     }
+    fclose(fp);
 }
