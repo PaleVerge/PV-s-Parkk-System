@@ -23,22 +23,28 @@ typedef struct parker {
     struct parker *next;
 } PARKER;
 
+PARKER * create_node(char aera);
+
 void menu(PARKER * head_A, PARKER * head_B, PARKER * head_C);
+
 void park(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void engage(PARKER * head);
-double leave_fee(PARKER * head,int * tot);
+
+double leave_fee(PARKER * head,double * tot);
 void fee(PARKER * head_A, PARKER * head_B, PARKER * head_C);
+
 void search(PARKER * head_A, PARKER * head_B, PARKER * head_C);
-void stat(PARKER * head_A, PARKER * head_B, PARKER * head_C);
-void  load_file(FILE * fp, PARKER * head);
-void save_file(FILE * fp, PARKER * head);
-PARKER * create_node(char aera);
+void find_vacant(PARKER *head);
+int  find_posid(PARKER *head);
 void park_info(PARKER * head);
+
+void stat(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void stat_paking_car(PARKER * head) ;
 void stat_old_car(PARKER * head);
 double stat_moon_fee(FILE *fp, int tag_year, int tag_moon) ;
-void find_vacant(PARKER *head);
-int  find_posid(PARKER *head);
+
+void  load_file(FILE * fp, PARKER * head);
+void save_file(FILE * fp, PARKER * head);
 
 int main(void) {
     FILE * fp_A,* fp_B,* fp_C;
@@ -108,6 +114,7 @@ void park(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
             engage(head_C);
         } else {
             printf("没有既不大又不小还不中的车！");
+            return ;
         }
     }
 }
@@ -137,13 +144,15 @@ void engage(PARKER *head) {
             printf("按q退出\n");
         } else {
             printf("输入不合法,即将返回上级\n");
+            return ;
         }
     }
+
 }
 
 void fee(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
-    int tot=0;
+    double tot=0;
     while (scanf("%d", &option) == 1) {
         if (option == 0) {
             menu(head_A, head_B, head_C);
@@ -163,7 +172,7 @@ void fee(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
         fclose(fp);
     }
 }
-double leave_fee(PARKER * head,int * tot) { //汽车离开，计算并返回停车费
+double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
     double fee;
     PARKER * pre_p=head,*p=head->next;
     char cur_car_id[10];
@@ -172,27 +181,30 @@ double leave_fee(PARKER * head,int * tot) { //汽车离开，计算并返回停车费
     while (p!=NULL) {
         if (!strcmp(p->car_id,cur_car_id)){
             printf("请输入当前时间:\n格式-时:分：\n");
-            scanf("%d时%d分", &p->park.hour, &p->park.minute);
+            scanf("%d时%d分", &p->leave.hour, &p->leave.minute);
+
             int start = p->park.hour * 60 + p->park.minute;
             int end = p->leave.hour * 60 + p->leave.minute;
             int during =end-start;
-            double h = during/60;
-
+            int hour = during/60;
             int minute=during % 60;
-
-            if (minute==0) { //整小时
-                h = during/60;
-            }
-            else if(minute<=30) {
-                h+=0.5;
+            double fee_time;
+            if (minute==0) { //整小时不变
+                fee_time=hour;
             }else {
-                h+=1;
+                if(minute<=30) {
+                  fee_time=hour+0.5;
+                }else {
+                  fee_time=hour+1;
+               }
             }
-            if (head->pos_id>p->pos_id) {
-                head->pos_id=p->pos_id;
+
+            if (head->pos_id > p->pos_id) {
+                head->pos_id = p->pos_id;
             }
             pre_p->next=p->next;
-            fee=head->price*h;
+            fee=head->price*fee_time;
+
             free(p);
             *tot+=fee;
             return fee;
