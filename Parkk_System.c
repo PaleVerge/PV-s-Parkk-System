@@ -10,7 +10,7 @@
 
 typedef struct parker {
     int pos_id;
-    char car_id[10];
+    char car_id[9];
     struct time {
         int year;
         int month;
@@ -34,7 +34,7 @@ double leave_fee(PARKER * head,double * tot);
 void day_fee(int tag_year,int tag_month,int tag_day,double fee);
 void search(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void find_space(PARKER *head);
-int  find_space_id(PARKER *head);
+int  find_car(PARKER *head,char cur_car_id[]);
 void park_info(PARKER * head);
 void stat(PARKER * head_A, PARKER * head_B, PARKER * head_C);
 void stat_paking_car(PARKER * head) ;
@@ -62,8 +62,7 @@ int main(void) {
 void menu(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
     while (1) {
-        printf("\n");
-        printf("\t╔═══════════════════════════════════════════╗\n");
+        printf("\n\t╔═══════════════════════════════════════════╗\n");
         printf("\t║             欢迎使用停车场管理系统        ║\n");
         printf("\t╠═══════════════════════════════════════════╣\n");
         printf("\t║                                           ║\n");
@@ -76,31 +75,48 @@ void menu(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
         printf("\t╚═══════════════════════════════════════════╝\n");
         printf("\t输入数字选择功能:");
         if (scanf("%d", &option) != 1) {
-            printf("\t只能输入数字1-5选择功能哦\n");
-            printf("\n\t[按任意键返回菜单...]");
-            fflush(stdin);
-            getchar();
-        }
-
-        if (option == 1) {
-            park(head_A, head_B, head_C);
-        } else if (option == 2) {
-            fee(head_A, head_B, head_C);
-        } else if (option == 3) {
-            search(head_A, head_B, head_C);
-        } else if (option == 4) {
-            stat(head_A, head_B, head_C);
-        } else if (option == 5) {
-            save_file("area_A.dat",head_A);
-            save_file("area_B.dat",head_B);
-            save_file("area_C.dat",head_C);
-            return ;
-        } else {
-            printf("\t只能输入数字1-5选择功能哦\n");
-            printf("\n\t[按任意键返回菜单...]");
-            fflush(stdin);
+            printf("\t只能输入数字1-5选择功能哦,回车键继续\n\t");
+            while (getchar()!='\n');
             getchar();
             system("cls");
+            continue;//继续循环
+        }else {
+            switch (option) {
+                case 1: {
+                    system("cls");
+                    park(head_A, head_B, head_C);
+                    break;
+                }
+                case 2: {
+                    system("cls");
+                    fee(head_A, head_B, head_C);
+                    break;
+                }
+
+                case 3: {
+                    system("cls");
+                    search(head_A, head_B, head_C);
+                    break;
+                }
+                case 4: {
+                    system("cls");
+                    stat(head_A, head_B, head_C);
+                    break;
+                }
+                case 5: {
+                    save_file("area_A.dat",head_A);
+                    save_file("area_B.dat",head_B);
+                    save_file("area_C.dat",head_C);
+                    return ;
+                }
+                default: {
+                    printf("\t只能输入数字1-5选择功能哦,回车键继续\n\t");
+                    while (getchar()!='\n');
+                    getchar();
+                    system("cls");
+                    break;
+                }
+            }
         }
         save_file("area_A.dat",head_A);
         save_file("area_B.dat",head_B);
@@ -111,46 +127,59 @@ void park(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
 
     while (1) {
-        printf("\t╔════════════════════════════════════════════╗\n");
-        printf("\t║                                            ║\n");
-        printf("\t║                  (1)轿车                   ║\n");
-        printf("\t║                  (2)中型/货车              ║\n");
-        printf("\t║                  (3)大型/货车              ║\n");
-        printf("\t║   (4)返回菜单                              ║\n");
-        printf("\t╚════════════════════════════════════════════╝\n");
+        printf("\n\t╔═══════════════════════════════════════════╗\n");
+        printf("\t║                 我 要 停 车               ║\n");
+        printf("\t╠═══════════════════════════════════════════╣\n");
+        printf("\t║                  (1)轿车                  ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t║                  (2)中型/货车             ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t║                  (3)大型/货车             ║\n");
+        printf("\t║   (4)返回菜单                             ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t╚═══════════════════════════════════════════╝\n");
         printf("\t选择车型或返回:");
 
         if (scanf("%d", &option) != 1) {
-            printf("\t只能输入数字选择功能哦\n");
-            while (getchar() != '\n');
-            back();
-            return ;
-        }
-
-        if (option==4) {
+            printf("\t只能输入数字1-5选择功能哦,回车键继续\n\t");
+            while (getchar()!='\n');
+            getchar();
             system("cls");
-            return;
+            continue;//继续循环
         }
-        if (option == 1) {
-            engage(head_A);
-            save_file("area_A.dat",head_A);
+        switch (option) {
+            case 1: {
+                engage(head_A);
+                save_file("area_A.dat",head_A);
 
-            back();
-            return ;
-        } else if (option == 2) {
-            engage(head_B);
-            save_file("area_B.dat",head_B);
+                back();
+                return ;
+            }
+            case 2: {
+                engage(head_B);
+                save_file("area_B.dat",head_B);
 
-            back();
-            return ;
-        } else if (option == 3) {
-            engage(head_C);
-            save_file("area_C.dat",head_C);
+                back();
+                return ;
+            }
+            case 3: {
+                engage(head_C);
+                save_file("area_C.dat",head_C);
 
-            back();
-            return ;
-        } else {
-            printf("\t没有不大不小不中的车！");
+                back();
+                return ;
+            }
+            case 4: {
+                system("cls");
+                return;
+            }
+            default: {
+                printf("\t只能输入数字1-4哦,回车键继续\n");
+                while (getchar()!='\n');
+                getchar();
+                system("cls");
+                break;
+            }
         }
     }
 }
@@ -182,9 +211,14 @@ void engage(PARKER *head) {
     printf("\t═════════════════════════════════════════════\n\t请输入当前时间(格式yyyy m d h m,数字间以空格隔开即可):");
 
     if (scanf("%d %d %d %d %d",&newcar->park.year,&newcar->park.month,&newcar->park.day,&newcar->park.hour, &newcar->park.minute)==5) {
-        printf("\t请输入车牌号:");
-        scanf("%s", newcar->car_id);
-
+        if (newcar->park.year<=1970) {
+            printf("\t输入年份不可早于1970年.\n");
+            back();
+            return ;
+        }
+        printf("\t请输入车牌号,如鲁D12345,不分大小写:");
+        scanf("%9s", newcar->car_id);
+        strupr(newcar->car_id);
         newcar->area=head->area;
         newcar->pos_id = head->pos_id;
 
@@ -207,62 +241,79 @@ void fee(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     double tot=0;
 
     while (1) {
-        printf("\t╔════════════════════════════════════════════╗\n");
-        printf("\t║                                            ║\n");
-        printf("\t║                  (1)轿车                   ║\n");
-        printf("\t║                  (2)中型/货车              ║\n");
-        printf("\t║                  (3)大型/货车              ║\n");
-        printf("\t║   (4)返回菜单                              ║\n");
-        printf("\t╚════════════════════════════════════════════╝\n");
+        printf("\n\t╔═══════════════════════════════════════════╗\n");
+        printf("\t║                  我 要 交 费              ║\n");
+        printf("\t╠═══════════════════════════════════════════╣\n");
+        printf("\t║                  (1)轿车                  ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t║                  (2)中型/货车             ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t║                  (3)大型/货车             ║\n");
+        printf("\t║   (4)返回菜单                             ║\n");
+        printf("\t║                                           ║\n");
+        printf("\t╚═══════════════════════════════════════════╝\n");
         printf("\t选择车型或返回:");
 
         if (scanf("%d", &option) != 1) {
             printf("\t只能输入数字选择功能哦\n");
             while (getchar() != '\n');
+            getchar();
+            system("cls");
             continue;
         }
-        if (option == 4) {
-            system("cls");
-            return ;
-        }
-        if (option == 1) {
-            fee=fabs(leave_fee(head_A,&tot));
-            if (fee<1e-6) {
-                printf("\t您似乎没在本停车场停车.\n");
+        switch (option) {
+            case 1: {
+                fee=fabs(leave_fee(head_A,&tot));
+                if (fee<1e-6) {
+                    printf("\t您似乎没在本停车场停车.\n");
 
-                back();
-                return ;
-            }else {
-                printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
+                    back();
+                    return ;
+                }else {
+                    printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
 
-                back();
+                    back();
+                    return ;
+                }
+            }
+            case 2: {
+                fee=fabs(leave_fee(head_B,&tot));
+                if ((fee<1e-6)) {
+                    printf("\t您似乎没在本停车场停车.\n");
+
+                    back();
+                    return ;
+                }else {
+                    printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
+
+                    back();
+                    return ;
+                }
+            }
+            case 3: {
+                fee=fabs(leave_fee(head_C,&tot));
+                if (fee<1e-6){
+                    printf("\t您似乎没在本停车场停车.\n");
+
+                    back();
+                    return ;
+                }else {
+                    printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
+
+                    back();
+                    return ;
+                }
+            }
+            case 4: {
+                system("cls");
                 return ;
             }
-        } else if (option == 2) {
-            fee=fabs(leave_fee(head_B,&tot));
-            if ((fee<1e-6)) {
-                printf("\t您似乎没在本停车场停车.\n");
-
-                back();
-                return ;
-            }else {
-                printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
-
-                back();
-                return ;
-            }
-        } else if (option == 3) {
-            fee=fabs(leave_fee(head_C,&tot));
-            if (fee<1e-6){
-                printf("\t您似乎没在本停车场停车.\n");
-
-                back();
-                return ;
-            }else {
-                printf("\t您本次停车费用为%.2f,祝您一路顺风~\n", fee);
-
-                back();
-                return ;
+            default: {
+                printf("\t只能输入数字1-4选择功能哦\n");
+                while (getchar()!='\n');
+                getchar();
+                system("cls");
+                break;
             }
         }
     }
@@ -306,13 +357,17 @@ void day_fee(int tag_year,int tag_month,int tag_day,double add_fee) {
 double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
     PARKER * pre_p=head,*p=head->next;
     char cur_car_id[9];
-    printf("\t请输入车牌号:");
+    printf("\t请输入车牌号,如鲁D12345,不分大小写:");
     if (scanf("%9s",cur_car_id)==1) {
         while (p!=NULL) {
-            if (!strcmp(p->car_id,cur_car_id)){
-                printf("\t请输入当前离场时间((格式yyyy m d h m,数字间以空格隔开即可)):");
+            if (!strcmp(p->car_id,strupr(cur_car_id))){
+                printf("\t请输入当前离场时间(格式yyyy m d h m,数字间以空格隔开即可):");
                 scanf("%d %d %d %d %d",&p->leave.year,&p->leave.month,&p->leave.day,&p->leave.hour, &p->leave.minute);
-
+                if (p->leave.year<=1970) {
+                    printf("输入年份不可早于1970年\n");
+                    back();
+                    return 0;
+                }
                 struct tm start={0},end={0};
                 start.tm_year = p->park.year-1900;
                 start.tm_mon = p->park.month-1;
@@ -367,59 +422,78 @@ double leave_fee(PARKER * head,double * tot) { //汽车离开，计算并返回停车费
 }
 void search(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
+    int found=0;
+    char cur_car_id[9];
     while (1) {
-        printf("\t╔═══════════════════════════════════════════╗\n");
+        printf("\n\t╔═══════════════════════════════════════════╗\n");
+        printf("\t║                  信息查询                 ║\n");
+        printf("\t╠═══════════════════════════════════════════╣\n");
         printf("\t║             (1)停车信息查询               ║\n");
         printf("\t║                                           ║\n");
         printf("\t║             (2)空闲车位号查询             ║\n");
         printf("\t║                                           ║\n");
         printf("\t║             (3)汽车车位号查询             ║\n");
-        printf("\t║                                           ║\n");
         printf("\t║   (4)返回菜单                             ║\n");
+        printf("\t║                                           ║\n");
         printf("\t╚═══════════════════════════════════════════╝\n");
         printf("\t请选择查询操作:");
 
         if (scanf("%d", &option) != 1) {
             while (getchar() != '\n');
-            printf("请重新输入.\n");
+            system("cls");
+            printf("\t只能输入数字1-4,请重新输入.\n");
             continue;
         }
-        if (option==4) {
-            system("cls");
-            return;
-        }
-        if (option == 1) {
-            printf("\t═══════════════════════════════════════════════════════\n");
-            park_info(head_A);
-            printf("\t═══════════════════════════════════════════════════════\n");
-            park_info(head_B);
-            printf("\t═══════════════════════════════════════════════════════\n");
-            park_info(head_C);
-            printf("\t═══════════════════════════════════════════════════════\n");
+        switch (option) {
+            case 1: {
+                printf("\t═══════════════════════════════════════════════════════\n");
+                park_info(head_A);
+                printf("\t═══════════════════════════════════════════════════════\n");
+                park_info(head_B);
+                printf("\t═══════════════════════════════════════════════════════\n");
+                park_info(head_C);
+                printf("\t═══════════════════════════════════════════════════════\n");
 
-            back();
-            return ;
-        } else if (option == 2) {
-            find_space(head_A);
-            printf("\n\t════════════════════════════════════════════════\n");
-            find_space(head_B);
-            printf("\n\t════════════════════════════════════════════════\n");
-            find_space(head_C);
-            printf("\n\t════════════════════════════════════════════════\n");
+                back();
+                return;
+            }
+            case 2: {
+                find_space(head_A);
+                printf("\n\t════════════════════════════════════════════════\n");
+                find_space(head_B);
+                printf("\n\t════════════════════════════════════════════════\n");
+                find_space(head_C);
+                printf("\n\t════════════════════════════════════════════════\n");
 
-            back();
-            return ;
-        } else if (option == 3) {
-            if (!find_space_id(head_A)) {
-                if (!find_space_id(head_B)) {
-                    if (!find_space_id(head_C)) {
+                back();
+                return;
+            }
+            case 3: {
+                found=0;
+                printf("\t请输入车牌号,如鲁D12345,不分大小写:");
+                if (scanf("%9s", cur_car_id)==1) {
+                    if (find_car(head_A,cur_car_id)) found=1;
+                    if (find_car(head_B,cur_car_id)) found=1;
+                    if (find_car(head_C,cur_car_id)) found=1;
+                    if (!found) {
                         printf("\t═════════════════════════════════════════════\n");
                         printf("\t全场都没找到你的车\n");
-
-                        back();
-                        return ;
                     }
+                    back();
+                    break;
+                }else {
+                    printf("车牌号输入不合法\n");
+                    while (getchar() != '\n');
+                    return ;
                 }
+            }
+            case 4: {
+                system("cls");
+                return ;
+            }
+            default: {
+                printf("\t只能输入数字1-4选择功能哦\n");
+                break;
             }
         }
     }
@@ -455,44 +529,33 @@ void find_space(PARKER *head) {
         }
     }
 }
-int  find_space_id(PARKER *head) {
+int  find_car(PARKER *head,char cur_car_id[]) {
     PARKER * p=head->next;//从第二个节点开始
-    if (p==NULL) {
-        printf("\t%c区还没有车辆停进来.\n",head->area);
-        return 0;
-    }
-    char cur_car_id[9];
     int find=0;
-    printf("\t请输入车牌号(不用输入·):");
-    if (scanf("%9s", cur_car_id)==1) {
-        while (p != NULL) {
-            if (!strcmp(p->car_id,cur_car_id)) {
-                find=1;
-                printf("═════════════════════════════════════════════\n");
-                printf("\t尊贵的%s,您的爱车停放在%c区%02d.\n",cur_car_id,head->area,p->pos_id);
-            }
-            p=p->next;
+    while (p != NULL) {
+        if (!strcmp(p->car_id,strupr(cur_car_id))) {
+            find=1;
+            printf("\t═════════════════════════════════════════════\n");
+            printf("\t尊贵的%s,您的爱车停放在%c区%02d.\n",strupr(cur_car_id),head->area,p->pos_id);
         }
-        return find;
-    }else {
-        printf("车牌号输入不合法\n");
-        while (getchar() != '\n');
-        return 0;
+        p=p->next;
     }
-
+    return find;
 }
 void stat(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
     int option;
 
     while (1) {
-        printf("\t╔═══════════════════════════════════════════╗\n");
+        printf("\n\t╔═══════════════════════════════════════════╗\n");
+        printf("\t║                  数据统计                 ║\n");
+        printf("\t╠═══════════════════════════════════════════╣\n");
         printf("\t║             (1)停车数量统计               ║\n");
         printf("\t║                                           ║\n");
         printf("\t║             (2)长时间停车统计             ║\n");
         printf("\t║                                           ║\n");
         printf("\t║             (3)某月收费统计               ║\n");
-        printf("\t║                                           ║\n");
         printf("\t║   (4)返回菜单                             ║\n");
+        printf("\t║                                           ║\n");
         printf("\t╚═══════════════════════════════════════════╝\n");
         printf("\t请选择统计操作:");
 
@@ -500,46 +563,57 @@ void stat(PARKER *head_A, PARKER *head_B, PARKER *head_C) {
             while (getchar() != '\n');
             continue;
         }
-        if (option==4) {
-            system("cls");
-            return ;
-        }else if (option == 1) {
-            printf("═════════════════════════════════════════════\n");
-            stat_paking_car(head_A);
-            stat_paking_car(head_B);
-            stat_paking_car(head_C);
+        switch (option) {
+            case 1: {
+                printf("\t═════════════════════════════════════════════\n");
+                stat_paking_car(head_A);
+                stat_paking_car(head_B);
+                stat_paking_car(head_C);
 
-            back();
-            return ;
-        } else if (option == 2) {
-            int cur_year,cur_month,cur_day,cur_hour,cur_minute;
-            printf("═════════════════════════════════════════════\n");
-            printf("\t请输入当前时间((格式yyyy m d h m,数字间以空格隔开即可)):");
-            scanf("%d %d %d %d %d",&cur_year,&cur_month,&cur_day, &cur_hour, &cur_minute);
-            stat_old_car(head_A,cur_year,cur_month,cur_day, cur_hour, cur_minute);
-            stat_old_car(head_B,cur_year,cur_month,cur_day, cur_hour, cur_minute);
-            stat_old_car(head_C,cur_year,cur_month,cur_day, cur_hour, cur_minute);
-            printf("\t═════════════════════════════════════════════\n");
-
-            back();
-            return ;
-        } else if (option == 3) {
-            FILE * fp=fopen("day_total_fee.txt","r");
-            if (fp==NULL) {
-                printf("\t当前还没有收费.");
+                back();
+                return;
+            }
+            case 2: {
+                int cur_year,cur_month,cur_day,cur_hour,cur_minute;
+                printf("\t═════════════════════════════════════════════\n");
+                printf("\t请输入当前时间(格式yyyy m d h m,数字间以空格隔开即可):");
+                printf("\t═════════════════════════════════════════════\n");
+                scanf("%d %d %d %d %d",&cur_year,&cur_month,&cur_day, &cur_hour, &cur_minute);
+                stat_old_car(head_A,cur_year,cur_month,cur_day, cur_hour, cur_minute);
+                stat_old_car(head_B,cur_year,cur_month,cur_day, cur_hour, cur_minute);
+                stat_old_car(head_C,cur_year,cur_month,cur_day, cur_hour, cur_minute);
                 printf("\t═════════════════════════════════════════════\n");
 
                 back();
-                return ;
-            }else {
-                int tag_year,tag_moon;
-                printf("\t请输入待查询月份(yyyy m 数字间以空格隔开即可):");
-                scanf("%d %d", &tag_year, &tag_moon);
-                printf("\t停车场%d年%d月总营业额为:%.2f\n",tag_year,tag_moon,stat_moon_fee(fp,tag_year,tag_moon));
-                fclose(fp);
+                return;
+            }
+            case 3: {
+                FILE * fp=fopen("day_total_fee.txt","r");
+                if (fp==NULL) {
+                    printf("\t当前还没有收费.");
+                    printf("\t═════════════════════════════════════════════\n");
 
-                back();
+                    back();
+                    return;
+                }else {
+                    int tag_year,tag_moon;
+                    printf("\t请输入待查询月份(yyyy m 数字间以空格隔开即可):");
+                    scanf("%d %d", &tag_year, &tag_moon);
+                    printf("\t停车场%d年%d月总营业额为:%.2f\n",tag_year,tag_moon,stat_moon_fee(fp,tag_year,tag_moon));
+                    fclose(fp);
+
+                    back();
+                    return;
+                }
+            }
+            case 4: {
+                system("cls");
                 return ;
+            }
+            default: {
+                printf("\t只能输入数字1-5选择功能哦\n");
+                back();
+                break;
             }
         }
     }
@@ -552,7 +626,6 @@ void stat_paking_car(PARKER * head) {
         p=p->next;
     }
     printf("\t%c区共有%d辆车正在停放.\n",head->area,count_parking_car);
-
 }
 void stat_old_car(PARKER * head,int cur_year,int cur_month,int cur_day, int cur_hour, int cur_minute) {
     PARKER * p=head->next;
@@ -583,11 +656,11 @@ void stat_old_car(PARKER * head,int cur_year,int cur_month,int cur_day, int cur_
         double hour = (double)during/60;
         if (hour>5) {
             count_old++;
-            printf("\t车辆%s于%04d年%02d月%02d日%d时%d分在%c%02d停车,已经%.1f小时.\n",p->car_id,p->park.year,p->park.day,p->park.day,p->park.hour,p->park.minute,p->area,p->pos_id,(double)hour);
+            printf("\t车辆%s于%04d年%02d月%02d日%d时%d分在%c%02d停车,已经%.1f小时.\n\n",p->car_id,p->park.year,p->park.month,p->park.day,p->park.hour,p->park.minute,p->area,p->pos_id,(double)hour);
         }
         p=p->next;
     }
-    printf("\t停车超过5小时的车辆共有%d辆.\n",count_old);
+    printf("\t%c区停车超过5小时的车辆共有%d辆.\n",head->area,count_old);
 }
 double stat_moon_fee(FILE *fp, int tag_year, int tag_moon) {
 
@@ -660,7 +733,7 @@ void save_file(char filename[], PARKER * head) {
 }
 void back(void) {
     printf("\n\t[按任意键返回菜单...]");
-    fflush(stdin);
+    while (getchar()!='\n');
     getchar();
     system("cls");
 }
